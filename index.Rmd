@@ -28,12 +28,9 @@ Paragraph or two introducing your datasets and variables, why they are interesti
 I am a huge fan of the NFL so when I saw these two data sets I knew I wanted to know more. I have using NFL data sets for awhile now for stuff such as betting and Fantasy football so it was interesting to see what other types of data other people had collected. The first data set was one collected by a website called surveymonkey, and it was used to find the demography of all the different NFL teams and the GOP. The variables inside this data set are finding the number of different races in each NFL teams fan base. The second data set I chose was based on each NFL team and their fan base, tradition, Future wins, coaching and much more. These variables are used to describe what each team is like and how they are perceived it gives rating to which teams are the best in certain categories and worse in others. So with these two data sets I thought I could compare demography with the ratings of different teams. 
 
 ```{R}
-data(package = .packages(all.available = TRUE))
 library(tidyverse)
-
-install.packages("fivethirtyeight")
 library(fivethirtyeight)
-data()
+
 
 data1 <- nfl_fandom_surveymonkey
 data2 <- nfl_fav_team
