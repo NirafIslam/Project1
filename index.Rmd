@@ -19,14 +19,24 @@ tidy=TRUE, tidy.opts=list(width.cutoff=60), R.options=list(max.print=100))
 
 ## Data Wrangling, Exploration, Visualization
 
-### Name and EID here
+### Niraf Islam nmi235
 
 #### Introduction 
 
 Paragraph or two introducing your datasets and variables, why they are interesting to you, etc.
 
+I am a huge fan of the NFL so when I saw these two data sets I knew I wanted to know more. I have using NFL data sets for awhile now for stuff such as betting and Fantasy football so it was interesting to see what other types of data other people had collected. The first data set was one collected by a website called surveymonkey, and it was used to find the demography of all the different NFL teams and the GOP. The variables inside this data set are finding the number of different races in each NFL teams fan base. The second data set I chose was based on each NFL team and their fan base, tradition, Future wins, coaching and much more. These variables are used to describe what each team is like and how they are perceived it gives rating to which teams are the best in certain categories and worse in others. So with these two data sets I thought I could compare demography with the ratings of different teams. 
+
 ```{R}
-# read your datasets in here, e.g., with read_csv()
+data(package = .packages(all.available = TRUE))
+library(tidyverse)
+
+install.packages("fivethirtyeight")
+library(fivethirtyeight)
+data()
+
+data1 <- nfl_fandom_surveymonkey
+data2 <- nfl_fav_team
 
 ```
 
@@ -36,54 +46,88 @@ If your datasets are tidy already, demonstrate that you can reshape data with pi
 
 ```{R}
 # your tidying code (if applicable; can also wait until wrangling section)
+data1
+data2
 ```
 
     
 #### Joining/Merging
 
 ```{R}
-# your joining code
+data3 <- data1 %>% full_join(data2, by= "team")
+data3
 
-# your joining code
 ```
 
 Discussions of joining here. Feel encouraged to break up into more than once code chunk and discuss each in turn.
+Here I joined both the data sets by each NFL team.
 
 ####  Wrangling
 
 ```{R}
-# your wrangling code
+data3 %>% select(-c("asian_ind","black_ind", "hispanic_ind", "other_ind","white_ind", "asian_gop", "black_gop", "hispanic_gop", "other_gop", "white_gop", "stlouis_prox","nyc_prox", "bang_buck" )) -> data3
 
-# your wrangling code
+data3 %>% filter(team != "Grand Total", team != "San Diego Chargers") -> data3
+data3
 
-# your wrangling code
+data3 %>% filter(total_dem >100) -> most_diverse
+most_diverse
+
+diverse_percentage= data3 %>% arrange(dem_percent)
+diverse_percentage
+
+dem_ind_percentage= mutate(data3, dem_vs_ind= (total_dem/total_ind)*100) %>% arrange(dem_vs_ind)
+dem_ind_percentage
+
+ind_percentage_count= data3 %>% group_by(ind_percent) %>% summarize(n=n())
+ind_percentage_count
+
+data3_summary= summarize(data3, mean_total_respondents= mean(total_respondents, na.rm = TRUE), med_total_gop= median(total_gop, na.rm = TRUE))
+data3_summary
+
+data3 %>% select(everything()) %>% summarise_all(funs(sum(is.na(.))))
+
 ```
 
 Your discussion of wrangling section here. Feel encouraged to break up into more than once code chunk and discuss each in turn.
+
+Fist I wrangled certain columns that were in the data set that I wasn't going to use so I selected them and removed them from the data set. Then I used filter to get rid of two rows that were unnecessary for my data and that consisted of mostly NA's. I also used filter to see which teams had the most diverse fan base. I also used arrange to arrange my data set to in lowest to highest demography percentage. I then used mutate to add a column which calculates the percentage difference of demography and ind. I used the summary function to summarize the data from the joined data set. And finally I used summarize function to count the number of NA's in each column. 
+
 
 
 #### Visualizing
 
 ```{R}
-# your plot 1
+ggplot(data=data3, aes(x=tradition, y=future_wins)) + geom_point(aes(color= team)) + scale_x_continuous(name="Traditions", breaks = seq(0,100,10))+ scale_y_continuous(name = "Future Predicted Wins", breaks = seq(0,110,5)) + ggtitle("Traditons based on Wins")
 ```
 
 Your discussion of plot 1
 
+Here I made a scatter plot to see if there was a correlation between the tradtions teams have and their future predicted wins. 
+
 ```{R}
-# your plot 2
+ggplot(data3, aes(coaching, ownership)) + geom_jitter(aes(color= team), stat= "summary", fun=mean) + scale_x_continuous(name="Coaching", breaks = seq(0,100,20))+ scale_y_continuous(name = "Ownership", breaks = seq(0,100,25)) + ggtitle("Coaching Vs Ownership")
+
 ```
 
 Your discussion of plot 2
 
+Here I made a jitter plot to see the correlation between the coaching ratings and the ownership correcting. 
+
 ```{R}
-# your plot 3
+ggplot(data3) + geom_bar(aes(y= behavior, color = team)) + ggtitle("Behavior ratings on teams")
+
+
 ```
 
 Your discussion of plot 3
 
+Here I made are bar graph to see the behaviors of all the different teams.
+
 #### Concluding Remarks
 
+
+Looking at these data sets and doing this project I not only learned more about each team but I also learned how powerful and useful R is!
 If any!
 
 
